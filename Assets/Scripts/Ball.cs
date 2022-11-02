@@ -20,10 +20,10 @@ public class Ball : MonoBehaviour
     Vector3 direction;
 
     public float speed = 4;
-    float minSpeed = 4;
-    float maxSpeed = 20;
+    float minSpeed = 8;
+    float maxSpeed = 70;
 
-    float increaseSpeedRate = 0.1f;
+    float increaseSpeedRate = 0.2f;
 
     float maxAngleChange = 15;
     float minAngleChange = 10;
@@ -39,32 +39,77 @@ public class Ball : MonoBehaviour
         print("ray ->" + ray);
         leftLimit = -Camera.main.orthographicSize * Camera.main.aspect - transform.localScale.z / 2;
         rightLimit = Camera.main.orthographicSize * Camera.main.aspect + transform.localScale.z / 2;
-
+        // RaycastHit[] hit;
         collisionMask = LayerMask.GetMask("Solid");
+        // Physics.RaycastAll(transform.position, Vector3.forward, out hit, Mathf.Infinity, LayerMask.GetMask("Solid"));
+        RaycastHit[] hits = Physics.RaycastAll(new Ray(transform.position, transform.right), Mathf.Infinity, collisionMask);
+
+        foreach (RaycastHit hit in hits)
+        {
+            if(hit.collider != null && hit.collider.tag != Tags.bar)
+            {
+                rightLimit = hit.point.x - transform.localScale.z/1.5f;
+                Debug.DrawLine(transform.position, hit.point, UnityEngine.Color.blue, 10f);
+                break;
+            }
+        }
+
+        hits = Physics.RaycastAll(new Ray(transform.position, -transform.right), Mathf.Infinity, collisionMask);
+
+        foreach (RaycastHit hit in hits)
+        {
+            if(hit.collider != null && hit.collider.tag != Tags.bar)
+            {
+                leftLimit = hit.point.x + transform.localScale.z/1.5f;
+                Debug.DrawLine(transform.position, hit.point, UnityEngine.Color.blue, 10f);
+                break;
+            }
+        }
+
+        print(leftLimit);
+        print(rightLimit);
+
         ResetPosition();
     }
 
-    public void Update() {
+
+    public void Update() 
+    {
+
+        // speed += increaseSpeedRate * Time.deltaTime;
+        // speed = Mathf.Clamp(speed, minSpeed, maxSpeed);
+
+        // transform.position += velocity * Time.deltaTime;
+
+        if (transform.position.x <= leftLimit) 
+        {
+            print("AAA");
+            // OutLeft?.Invoke();
+            GameManager.Instance.HitLeft();
+            ResetPosition();
+        }
+        if(transform.position.x >= rightLimit) 
+        {
+            print("BBB");
+            // OutRight?.Invoke();
+            GameManager.Instance.HitRight();
+            ResetPosition();
+        }
+
+    }
+
+    void FixedUpdate()
+    {
 
         speed += increaseSpeedRate * Time.deltaTime;
         speed = Mathf.Clamp(speed, minSpeed, maxSpeed);
 
+
         CheckCollision(velocity);
-        // CheckCollision(Mathf.Sign(velocity.normalized.z) * Vector3.forward * (ray));
-        // CheckCollision(Mathf.Sign(velocity.normalized.x) * Vector3.right * (ray));
-
+        CheckCollision(Mathf.Sign(velocity.z) * Vector3.forward * (ray));
+        CheckCollision(Mathf.Sign(velocity.x) * Vector3.right * (ray));
+        transform.position += velocity * Time.fixedDeltaTime;
         SimulateBallTrajectory();
-
-        transform.position += velocity * Time.deltaTime;
-
-        // if (transform.position.x <= leftLimit) {
-        //     // OutLeft?.Invoke();
-        //     ResetPosition();
-        // }
-        // if(transform.position.x >= rightLimit) {
-        //     // OutRight?.Invoke();
-        //     ResetPosition();
-        // }
 
     }
 
@@ -155,24 +200,24 @@ public class Ball : MonoBehaviour
 
             if(Mathf.Approximately(Mathf.Abs(hit.normal.z), 1f))
             {
-                print("z "+hit.normal);
+                // print("z "+hit.normal);
                 offset = (ray) / lastDir.normalized.z * -hit.normal.z;
             }
             else if(Mathf.Approximately(Mathf.Abs(hit.normal.x), 1f))
             {
-                print("x");
+                // print("x");
                 offset = (ray) / lastDir.normalized.x * -hit.normal.x;
             }
 
             // hit.point = new Vector3(hit.point.x - (ray) * hit.normal.x, hit.point.y, hit.point.z + (ray) * hit.normal.z);
-            print("end -> "+hit.point);
-            print("hit -> "+hit.normal);
-            print("dir -> "+lastDir.normalized);
+            // print("end -> "+hit.point);
+            // print("hit -> "+hit.normal);
+            // print("dir -> "+lastDir.normalized);
             // print(hit.normal);
-            print("offset -> "+offset);
+            // print("offset -> "+offset);
             // Debug.DrawLine(transform.position, hit.point, UnityEngine.Color.green);
             hit.point = hit.point - offset * lastDir.normalized;
-            print("start -> "+hit.point);
+            // print("start -> "+hit.point);
 
             points.Add(hit.point);
 

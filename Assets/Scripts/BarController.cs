@@ -22,7 +22,7 @@ public class BarController : MonoBehaviour
         limitTop = hit.point.z;
         Physics.Raycast(transform.position, -Vector3.forward, out hit, Mathf.Infinity, LayerMask.GetMask("Solid"));
         limitBottom = hit.point.z;
-        StartCoroutine(ChangeSize(7,4));
+        StartCoroutine(ChangeSize(3f,4));
     }
 
     // Update is called once per frame

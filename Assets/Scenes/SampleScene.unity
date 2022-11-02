@@ -193,7 +193,7 @@ Canvas:
   serializedVersion: 3
   m_RenderMode: 1
   m_Camera: {fileID: 963194227}
-  m_PlaneDistance: 100
+  m_PlaneDistance: 26
   m_PixelPerfect: 0
   m_ReceivesEvents: 1
   m_OverrideSorting: 0
@@ -838,7 +838,7 @@ GameObject:
   - component: {fileID: 743015586}
   m_Layer: 8
   m_Name: Barra (1)
-  m_TagString: Untagged
+  m_TagString: Bar
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -970,7 +970,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: -180}
   m_AnchorMin: {x: 0.5124792, y: 0.91222227}
   m_AnchorMax: {x: 1, y: 0.97800004}
-  m_AnchoredPosition: {x: -13.5, y: -0.8801575}
+  m_AnchoredPosition: {x: -13.5, y: -0.88012695}
   m_SizeDelta: {x: -23.98999, y: 2.2399397}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &832024168
@@ -1763,6 +1763,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0e094479ef97e6542943593214d345e8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  PlayerHP: {fileID: 11400000, guid: d3b4f90593b08344786af9b732e3b908, type: 2}
+  ComputerHP: {fileID: 11400000, guid: 528646a0fbb619e45b005f4d9c94ce44, type: 2}
 --- !u!4 &1594090238
 Transform:
   m_ObjectHideFlags: 0

@@ -25,8 +25,8 @@ public class LimiteManager : MonoBehaviour
         if(col.tag != Tags.ball) return;
 
         if((int) mySide == 1)
-            GameManager.RightWin();
+            GameManager.Instance.HitLeft();
         else
-            GameManager.LeftWin();
+            GameManager.Instance.HitRight();
     }
 }
