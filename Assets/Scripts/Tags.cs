@@ -5,7 +5,8 @@ using UnityEngine;
 public class Tags : MonoBehaviour
 {
     public static string limite = "Limite",
-                         ball = "Ball";
+                         ball = "Ball",
+                         bar = "Bar";
                         //  tag = "nome da tag"
                         // ...
 }

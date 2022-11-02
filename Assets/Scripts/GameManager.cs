@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
+
     public static void LeftWin()
     {
         print("O lado esquerdo venceu!");
