@@ -6,7 +6,9 @@ public class GameManager : MonoBehaviour
 {
 
     public FloatVariable PlayerHP, ComputerHP;
+    public GameObject Result;
     public static GameManager Instance;
+
 
     /// <summary>
     /// Start is called on the frame when a script is enabled just before
@@ -16,18 +18,27 @@ public class GameManager : MonoBehaviour
     {
         if(Instance != null || Instance == this)
             Destroy(this.gameObject);
-
+        
+        Result.SetActive(false);
         Instance = this;    
     }
 
     public void HitLeft()
     {
         PlayerHP.ApplyChange(-1);
+        CheckIfWinOrLose();
     }
 
     public void HitRight()
     {
         ComputerHP.ApplyChange(-1);
+        CheckIfWinOrLose();
+    }
+
+    private void CheckIfWinOrLose()
+    {
+        if(PlayerHP.Value <= 0 || ComputerHP.Value <= 0)
+            Result.SetActive(true);
     }
 
     public void LeftWin()

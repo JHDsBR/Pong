@@ -29,16 +29,17 @@ public class BarController : MonoBehaviour
     void Update()
     {
         // transform.localScale = new Vector3(transform.localScale.x, transform.localScale.y, size);
-        Movement();
-        // KeepInsideTheField();
+        // Movement();
+        Move(Input.GetAxis("Vertical") * movementSpeed * Time.deltaTime);
+        KeepInsideTheField();
     }
 
-    void Movement()
-    {
-        dir = Input.GetAxis("Vertical");
-        transform.position += movementSpeed * Time.deltaTime * dir * transform.forward;
-        transform.position = new Vector3(transform.position.x, transform.position.y, Mathf.Clamp(transform.position.z, limitBottom+size/2, limitTop-size/2));
-    }
+    // void Movement()
+    // {
+    //     dir = Input.GetAxis("Vertical");
+    //     transform.position += movementSpeed * Time.deltaTime * dir * transform.forward;
+    //     transform.position = new Vector3(transform.position.x, transform.position.y, Mathf.Clamp(transform.position.z, limitBottom+size/2, limitTop-size/2));
+    // }
 
     public float GetDirectionInput()
     {
@@ -68,7 +69,7 @@ public class BarController : MonoBehaviour
 
     
     // mantém a barra dentro do campo
-    void KeepInsideTheField()
+    protected void KeepInsideTheField()
     {
         Vector3 myPos = transform.position;
         float myZ = myPos.z;
@@ -79,5 +80,10 @@ public class BarController : MonoBehaviour
             myPos.z = limitBottom + size/2;
 
         transform.position = myPos; 
+    }
+
+    protected void Move(float step)
+    {
+        transform.position += transform.forward * step;
     }
 }

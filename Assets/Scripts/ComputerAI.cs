@@ -4,7 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ComputerAI : MonoBehaviour {
+public class ComputerAI : BarController {
 
     enum STATES { WAITING, REASONING, ACTING }
 
@@ -25,7 +25,7 @@ public class ComputerAI : MonoBehaviour {
 
     float distanceToReact     = 0f;
     float uncertaintyPosition = 0.8f;
-    float speed = 10f;
+    float speed = 5f;
 
     float randomMove = 0;
     float randomMoveInterval = 1.0f;
@@ -130,20 +130,34 @@ public class ComputerAI : MonoBehaviour {
                break;
         }
 
+        // KeepInsideTheField();
+
     }
     
     // Faz a raquete se mover suavemente para a posição alvo, respeitando os limites da tela
     void GoToPosition() {
 
-        currentPosition = Mathf.MoveTowards(currentPosition, targetPosition, speed * Time.deltaTime);
+        // currentPosition = Mathf.MoveTowards(currentPosition, targetPosition, speed * Time.deltaTime);
 
-        transform.position = new Vector3(transform.position.x, transform.position.y, currentPosition);
+        Move(Mathf.Sign(targetPosition-transform.position.z) * speed * Time.deltaTime);
 
-        transform.position = new Vector3(transform.position.x,
-                                transform.position.y,
-                                Mathf.Clamp(transform.position.z,
-                                bottomLimit + transform.localScale.z / 2,
-                                topLimit - transform.localScale.z / 2));
+        // transform.position = new Vector3(transform.position.x, transform.position.y, currentPosition);
+
+        // transform.position = new Vector3(transform.position.x,
+                                // transform.position.y,
+                                // Mathf.Clamp(transform.position.z,
+                                // bottomLimit + transform.localScale.z / 2,
+                                // topLimit - transform.localScale.z / 2));
+
+        // currentPosition = Mathf.MoveTowards(currentPosition, targetPosition, speed * Time.deltaTime);
+
+        // transform.position = new Vector3(transform.position.x, transform.position.y, currentPosition);
+
+        // transform.position = new Vector3(transform.position.x,
+        //                         transform.position.y,
+        //                         Mathf.Clamp(transform.position.z,
+        //                         bottomLimit + transform.localScale.z / 2,
+        //                         topLimit - transform.localScale.z / 2));
 
     }
 
