@@ -2,52 +2,97 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+// public enum GameModes{SINGLE=0, VERSUS=1, COOP=2}
+
 public class GameManager : MonoBehaviour
 {
-
-    public FloatVariable PlayerHP, ComputerHP;
-    public GameObject Result;
+    public Material campoColor;
+    private int currentGameMode; // SINGLE=0, VERSUS=1, COOP=2
+    private Color currentColor;
+    private AudioSource[] sources;
+    private float volume;
     public static GameManager Instance;
 
 
-    /// <summary>
-    /// Start is called on the frame when a script is enabled just before
-    /// any of the Update methods is called the first time.
-    /// </summary>
+
     void Start()
+    {
+        UpdateOnLoad();
+    }
+
+    void OnLevelWasLoaded()
+    {
+        UpdateOnLoad();
+    }
+
+    void UpdateOnLoad()
+    {
+        this.sources = GameObject.FindSceneObjectsOfType(typeof(AudioSource)) as AudioSource[];
+        SetSourceVolume();
+    }
+
+    void Awake()
     {
         if(Instance != null || Instance == this)
             Destroy(this.gameObject);
+            
+        SetCurrentColor(new Color(PlayerPrefs.GetFloat("red",0.08715761f),
+                                  PlayerPrefs.GetFloat("green",1),
+                                  PlayerPrefs.GetFloat("blue",0), 1));
         
-        Result.SetActive(false);
+        SetVolume(PlayerPrefs.GetFloat("volume",0.7f));
+
         Instance = this;    
+        DontDestroyOnLoad(this.gameObject);
     }
 
-    public void HitLeft()
+    public void SetCurrentGameMode(int newGameMode)
     {
-        PlayerHP.ApplyChange(-1);
-        CheckIfWinOrLose();
+        if(newGameMode < 0 || newGameMode > 2)
+            return;
+
+        this.currentGameMode = newGameMode;
+    }
+    
+    public int GetCurrentGameMode()
+    {
+        return this.currentGameMode;
     }
 
-    public void HitRight()
+    public void SetCurrentColor(Color color)
     {
-        ComputerHP.ApplyChange(-1);
-        CheckIfWinOrLose();
+        PlayerPrefs.SetFloat("red",color[0]);
+        PlayerPrefs.SetFloat("green",color[1]);
+        PlayerPrefs.SetFloat("blue",color[2]);
+
+        this.currentColor = color;
+        
+        campoColor.SetColor("_Color", color);
     }
 
-    private void CheckIfWinOrLose()
+    public Color GetCurrentColor()
     {
-        if(PlayerHP.Value <= 0 || ComputerHP.Value <= 0)
-            Result.SetActive(true);
+        return this.currentColor;
     }
 
-    public void LeftWin()
+    public void SetSourceVolume()
     {
-        print("O lado esquerdo venceu!");
+        if(this.sources == null)
+            return;
+
+        foreach (AudioSource audio in this.sources)
+            audio.volume = GetVolume();
     }
 
-    public void RightWin()
+    public void SetVolume(float volume)
     {
-        print("O lado direito venceu!");
+        PlayerPrefs.SetFloat("volume", volume);
+        this.volume = volume;
+        SetSourceVolume();
+    }
+
+    public float GetVolume()
+    {
+        return this.volume;
     }
 }

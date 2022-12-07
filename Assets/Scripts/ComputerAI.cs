@@ -24,8 +24,7 @@ public class ComputerAI : BarController {
     float targetPosition;
 
     float distanceToReact     = 0f;
-    float uncertaintyPosition = 0.8f;
-    float speed = 5f;
+    float uncertaintyPosition = 0.5f;
 
     float randomMove = 0;
     float randomMoveInterval = 1.0f;
@@ -37,11 +36,12 @@ public class ComputerAI : BarController {
     public LineRenderer lineRenderer;
 
     void Start() {
+        SetStartLocalScale();
         trajectoryMarkPrefab = Resources.Load<Transform>("trajectoryMark");
 
         state = STATES.WAITING;
 
-        ball = FindObjectOfType<Ball>();
+        this.ball = FindObjectOfType<Ball>();
 
         rightLimit = Camera.main.orthographicSize * Camera.main.aspect + transform.localScale.z / 2;
 
@@ -57,11 +57,21 @@ public class ComputerAI : BarController {
         topLimit = distanceFromWall; // limite baseado no tamanho da camera
         bottomLimit = -distanceFromWall; // limite baseado no tamanho da camera
         Debug.DrawLine(transform.position, transform.position + transform.forward*distanceFromWall, UnityEngine.Color.green, 50f);
-        distanceToReact = transform.position.x - 5;
+        distanceToReact = transform.position.x - 6;
+
+        print(transform.position);
+        print(transform.position);
+        print(transform.position);
+        print(transform.position);
 
     }
 
     public void Update() {
+        
+        if(GameplayManager.Instance.stopGame)
+            return;
+
+        SetNearstBall();
 
         switch (state) {
 
@@ -70,25 +80,27 @@ public class ComputerAI : BarController {
                 // Se a bolinha está se movendo pra direita (1° condição) e a posição dela ultrapassou o 
                 // limite pra IA reagir (2° condição), então, muda o estado pra "REAGINDO"
                 if (side == 1) {
-                    if (Mathf.Sign(ball.velocity.x) > 0 && ball.transform.position.x >=  distanceToReact) {
+                    if (Mathf.Sign(this.ball.velocity.x) > 0 && this.ball.transform.position.x >=  distanceToReact) {
                         state = STATES.REASONING;
                     }
                 } else {
-                    if (Mathf.Sign(ball.velocity.x) < 0 && ball.transform.position.x <= -distanceToReact) {
+                    if (Mathf.Sign(this.ball.velocity.x) < 0 && this.ball.transform.position.x <= -distanceToReact) {
                         state = STATES.REASONING;
                     }
                 }
                 // Move a raquete para a posição da bolinha caso o tempo ultrapassou o delay de movimento (1° condição)
                 // e se a posição da bola é menor que a distancia para reagir
                 if (side == 1) {
-                    if (Time.time >= randomMove && ball.transform.position.x <= distanceToReact) {
-                        targetPosition = ball.transform.position.z;
-                        randomMove = Time.time + UnityEngine.Random.Range(1, 1.5f);
+                    if (Time.time >= randomMove && this.ball.transform.position.x <= distanceToReact) {
+                        targetPosition = this.ball.transform.position.z;
+                        // randomMove = Time.time + 1f;
+                        randomMove = Time.time + UnityEngine.Random.Range(0.2f, 0.6f);
                     }
                 } else {
-                    if (Time.time >= randomMove && ball.transform.position.x >= -distanceToReact) {
-                        targetPosition = ball.transform.position.z;
-                        randomMove = Time.time + UnityEngine.Random.Range(1, 1.5f);
+                    if (Time.time >= randomMove && this.ball.transform.position.x >= -distanceToReact) {
+                        targetPosition = this.ball.transform.position.z;
+                        // randomMove = Time.time + 1f;
+                        randomMove = Time.time + UnityEngine.Random.Range(0.2f, 0.6f);
                     }
                 }
                // Aplica o movimento
@@ -119,11 +131,11 @@ public class ComputerAI : BarController {
                 // caso a bolinha seja rebativa (1° condição) ou ultrapasse o limite da tela, volta
                 // pro estado ESPERANDO
                 if (side == 1) {
-                    if (Mathf.Sign(ball.velocity.x) < 0 || ball.transform.position.x >= 8.5f) {
+                    if (Mathf.Sign(this.ball.velocity.x) < 0 || ball.transform.position.x >= 8.5f) {
                         state = STATES.WAITING;
                     }
                 } else {
-                    if (Mathf.Sign(ball.velocity.x) > 0 || ball.transform.position.x <= -8.5f) {
+                    if (Mathf.Sign(this.ball.velocity.x) > 0 || ball.transform.position.x <= -8.5f) {
                         state = STATES.WAITING;
                     }
                 }
@@ -137,19 +149,26 @@ public class ComputerAI : BarController {
     // Faz a raquete se mover suavemente para a posição alvo, respeitando os limites da tela
     void GoToPosition() {
 
-        // currentPosition = Mathf.MoveTowards(currentPosition, targetPosition, speed * Time.deltaTime);
+        // currentPosition = Mathf.MoveTowards(currentPosition, targetPosition, movementSpeed * Time.deltaTime);
 
-        Move(Mathf.Sign(targetPosition-transform.position.z) * speed * Time.deltaTime);
+        // float distance = targetPosition-transform.position.z;
 
+        // if(distance < 0.1f)
+        //     return;
+
+        transform.position = Vector3.MoveTowards(transform.position,  new Vector3(transform.position.x, transform.position.y, targetPosition), movementSpeed * Time.deltaTime);
+
+        // float offset = Mathf.Sign(distance) * movementSpeed * Time.deltaTime;
+        // Move(offset);
         // transform.position = new Vector3(transform.position.x, transform.position.y, currentPosition);
 
-        // transform.position = new Vector3(transform.position.x,
-                                // transform.position.y,
-                                // Mathf.Clamp(transform.position.z,
-                                // bottomLimit + transform.localScale.z / 2,
-                                // topLimit - transform.localScale.z / 2));
+        transform.position = new Vector3(transform.position.x,
+                                transform.position.y,
+                                Mathf.Clamp(transform.position.z,
+                                bottomLimit + transform.localScale.z / 2,
+                                topLimit - transform.localScale.z / 2));
 
-        // currentPosition = Mathf.MoveTowards(currentPosition, targetPosition, speed * Time.deltaTime);
+        // currentPosition = Mathf.MoveTowards(currentPosition, targetPosition, movementSpeed * Time.deltaTime);
 
         // transform.position = new Vector3(transform.position.x, transform.position.y, currentPosition);
 
@@ -164,11 +183,11 @@ public class ComputerAI : BarController {
     void SimulateBallTrajectory() {
 
         
-        List<Vector3> points = new List<Vector3>(){ball.transform.position};
+        List<Vector3> points = new List<Vector3>(){this.ball.transform.position};
 
         RaycastHit hit;
-        Vector3 lastPos = ball.transform.position;
-        Vector3 lastDir = ball.velocity;
+        Vector3 lastPos = this.ball.transform.position;
+        Vector3 lastDir = this.ball.velocity;
 
         for (var i = 0; i < 5; i++)
         {
@@ -177,7 +196,7 @@ public class ComputerAI : BarController {
             if(hit.collider == null)
                 break;
             // print(lastDir.normalized * ball.ray);
-            hit.point = hit.point - lastDir.normalized * (ball.ray + 0.075f);
+            hit.point = hit.point - lastDir.normalized * (this.ball.ray + 0.075f);
 
             points.Add(hit.point);
 
@@ -204,8 +223,8 @@ public class ComputerAI : BarController {
         int iterations = 3;
         float step     = 10f;
 
-        Vector3 position = ball.transform.position;
-        Vector3 velocity = ball.velocity;
+        Vector3 position = this.ball.transform.position;
+        Vector3 velocity = this.ball.velocity;
 
         while (iterations > 0) {
 
@@ -239,6 +258,36 @@ public class ComputerAI : BarController {
             Instantiate(trajectoryMarkPrefab, trajectoryPoints[i], trajectoryMarkPrefab.rotation);
         }
         trajectoryPoints.Clear();
+    }
+
+    void SetNearstBall()
+    {
+        List<GameObject> balls = GameplayManager.Instance.GetBalls(); 
+
+        if(balls == null)
+            return;
+
+        float minDistance = Mathf.Infinity;
+        Ball oldBall = this.ball;
+        foreach (GameObject ball_ in balls)
+        {
+            float distance = transform.position.x - ball_.transform.position.x;
+            
+            Ball b = ball_.GetComponent<Ball>();
+            
+            if(b.velocity.x > 0 && distance < minDistance)
+            {
+                minDistance = distance;
+                this.ball = b;
+            }
+        }
+
+        if(this.ball != oldBall && state == STATES.ACTING)
+            state = STATES.WAITING;
+
+
+        Debug.DrawLine(transform.position, this.ball.transform.position, UnityEngine.Color.red);
+        
     }
 
     // // Desenha a trajetória simulada do movimento da bola

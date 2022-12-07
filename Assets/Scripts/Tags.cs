@@ -6,7 +6,8 @@ public class Tags : MonoBehaviour
 {
     public static string limite = "Limite",
                          ball = "Ball",
-                         bar = "Bar";
+                         bar = "Bar",
+                         powerup = "PowerUp";
                         //  tag = "nome da tag"
                         // ...
 }
